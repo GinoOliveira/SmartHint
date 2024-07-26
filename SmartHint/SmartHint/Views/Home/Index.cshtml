@@ -1,0 +1,153 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-left">
+    @* <h1 class="display-4">Welcome</h1> *@
+    <div class="row">
+        <div class="col-5">
+            <p>
+                Consulte os seus clientes cadastrados na sua loja <br />ou realize o cadastro de novos
+                clientes.
+            </p>
+        </div>
+        <div class="col-3">
+            <a class="btn btn-primary" asp-area="" asp-controller="Home" asp-action="Cadastro">Adicionar Cliente</a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 col-md-3">
+            <div class="input-group">
+                <div id="pesquisar" class="input-group-append">
+                    <button class="btn btn-outline-success"  onclick="CarregarClientes()">Pesquisar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br/>
+    <div id="tabela">
+        <table  class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col"><input id="chekedAll" type="checkbox"/></th>
+                    <th scope="col">Nome/Razão Social</th>
+                    <th scope="col">E-mail</th>
+                    <th scope="col">Telefone</th>
+                    <th scope="col">Data de cadastro</th>
+                    <th scope="col">Bloqueado</th>
+                </tr>
+            </thead>
+            <tbody id="tabelaBody">
+            </tbody>
+        </table>
+        <p id="totalPaginas"> </p>
+        <div id="paginationControls">
+            <button class="btn btn-primary" id="btnAnterior" onclick="paginaAnterior()">Anterior</button>
+            <button class="btn btn-primary" id="btnProximo" onclick="proximaPagina()">Próximo</button>
+        </div>
+    </div>
+</div>
+<script>
+    var paginaAtual = 1;
+    var itensPorPagina = 20;
+    $("#tabela").hide()
+    function CarregarClientes() {
+        $("#tabela").show()
+        $.get(`@(Url.Action("CarregarClientes", "Home"))`, function (data) {
+            var cliente = JSON.parse(data);
+            var startIndex = (paginaAtual - 1) * itensPorPagina;
+            var endIndex = startIndex + itensPorPagina;
+            var totalPaginas = document.getElementById("totalPaginas");
+            var calculoTotalPaginas = Math.ceil(cliente.length / itensPorPagina);
+
+            if (cliente.length > 0) {
+                totalPaginas.innerHTML = `<p id="totalpaginas">Total de páginas: ${paginaAtual}/${calculoTotalPaginas}</p>`;
+            }
+
+            var tableBody = document.getElementById('tabelaBody');
+            tableBody.innerHTML = '';
+
+            for (var i = startIndex; i < endIndex && i < cliente.length; i++) {
+                var item = cliente[i];
+                const dateStr = item.dtCriacao;
+                const dateObj = new Date(dateStr);
+                const formattedDate = dateObj.toLocaleDateString('pt-BR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+                var row = '<tr>';
+                row += `<th scope="row"><input class="ckeck" type="checkbox" /></th>`;
+                row += `<td>${item.nomeRazaoSocial}</td>`;
+                row += `<td>${item.email}</td>`;
+                row += `<td>${item.telefone}</td>`;
+                row += `<td>${formattedDate}</td>`;
+
+                if (item.bloqueado == true) {
+                    row += `<td>
+                                <input id="bloqueado" type="checkbox" checked disabled />
+                                <img id="edit" src="/images/edit.png" onclick="AtualizarCadastro('${item.cpfCnpj}', '${item.tipoPessoa}', '${item.nomeRazaoSocial}', '${item.telefone}', '${item.bloqueado}', '${item.dtNascimento}', '${item.genero}', '${item.inscricaoEst}', '${item.isento}', '${item.senha}', '${item.email}', '${item.id}')" />
+                            </td>`;
+                } else {
+                    row += `<td>
+                                <input id="bloqueado" type="checkbox" disabled />
+                                <img id="edit" src="/images/edit.png" onclick="AtualizarCadastro('${item.cpfCnpj}', '${item.tipoPessoa}', '${item.nomeRazaoSocial}', '${item.telefone}', '${item.bloqueado}', '${item.dtNascimento}', '${item.genero}', '${item.inscricaoEst}', '${item.isento}', '${item.senha}', '${item.email}', '${item.id}')" />
+                            </td>`;
+                }
+
+                row += '</tr>';
+                tableBody.innerHTML += row;
+            }
+
+            // Desabilitar botões se necessário
+            document.getElementById('btnAnterior').disabled = paginaAtual === 1;
+            document.getElementById('btnProximo').disabled = paginaAtual === calculoTotalPaginas;
+        });
+    }
+
+    function paginaAnterior() {
+        if (paginaAtual > 1) {
+            paginaAtual--;
+            CarregarClientes();
+        }
+    }
+
+    function proximaPagina() {
+        $.get(`@(Url.Action("CarregarClientes", "Home"))`, function (data) {
+            var cliente = JSON.parse(data);
+            var calculoTotalPaginas = Math.ceil(cliente.length / itensPorPagina);
+            if (paginaAtual < calculoTotalPaginas) {
+                paginaAtual++;
+                CarregarClientes();
+            }
+        });
+    }
+
+    $('#chekedAll').change(function () {
+        // Verifica se o checkbox "marcar todos" está marcado
+        if ($(this).is(':checked')) {
+            // Marca todos os checkboxes com a classe 'ckeck'
+            $('.ckeck').prop('checked', true);
+            console.log("on")
+        } else {
+            // Desmarca todos os checkboxes com a classe 'ckeck'
+            $('.ckeck').prop('checked', false);
+            console.log("off")
+        }
+    });
+
+    function AtualizarCadastro(cpfCnpj, tipoPessoa, nomeRazaoSocial, telefone, bloqueado, dtNascimento, genero, inscricaoEst, isento, senha, email, id) {
+        const dateStr = dtNascimento;
+        const dateObj = new Date(dateStr);
+        const formattedDate = dateObj.toLocaleDateString('pt-BR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+        window.location.href = `/Home/EditarCadastro?cpfCnpj=${cpfCnpj}&tipoPessoa=${tipoPessoa}&nomeRazaoSocial=${nomeRazaoSocial}&telefone=${telefone}
+                                &bloqueado=${bloqueado}&formattedDate=${formattedDate}&genero=${genero}&inscricaoEst=${inscricaoEst}&isento=${isento}&senha=${senha}&email=${email}&id=${id}`;
+    }
+
+</script>
+
+   

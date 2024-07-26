@@ -1,0 +1,313 @@
+﻿@{
+    ViewData["Title"] = "Atualização cadastral"; 
+    var cpfCnpjAtual = ViewData["CpfCnpj"] as string;
+    var tipoPessoaAtual = ViewData["tipoPessoa"] as string;
+    var nomeRazaoSocialAtual = ViewData["nomeRazaoSocial"] as string;
+    var telefoneAtual = ViewData["telefone"] as string;
+    var bloqueadoAtual = ViewData["bloqueado"] as string;
+    var dtNascimentoAtual = ViewData["dtNascimento"] as string;
+    var generoAtual = ViewData["genero"] as string;
+    var inscricaoEstAtual = ViewData["inscricaoEst"] as string;
+    var isentoAtual = ViewData["isento"] as string;
+    var senhaAtual = ViewData["senha"] as string;
+    var emailAtual = ViewData["email"] as string;
+    var id = ViewData["id"] as string;
+}
+<h3>@ViewData["Title"]</h3>
+<style>
+    #fundo {
+        background-color: #F1EFEF;
+        padding: 20px;
+        border-radius: 10px;
+    }
+
+    #cadastro {
+        box-shadow: 2px 2px 30px 10px rgba(0, 0, 0, 0.2);
+        padding: 10px;
+        border-radius: 2px;
+    }
+</style>
+<div id="fundo">
+    <div id="cadastro" class="container col-4 col-md-6 col-sm-12">
+        <form id="cadastroForm">
+            <!-- Área Principal -->
+            <h2>Atualização cadastral</h2>
+            <div class="form-group">
+                <label for="nomeCliente">Nome do Cliente/Razão Social</label>
+                <input type="text" class="form-control shadowed" id="nomeCliente" value="@nomeRazaoSocialAtual" maxlength="150" required>
+            </div>
+            <div class="form-group">
+                <label for="email">E-Mail</label>
+                <input type="email" class="form-control shadowed" value="@emailAtual" id="email" maxlength="150" required>
+            </div>
+            <p style="color: red;" id="emailCadastrado">E-mail já cadastrado.</p>
+            <div class="form-group">
+                <label for="telefone">Telefone</label>
+                <input type="text" class="form-control shadowed" id="telefone" value="@telefoneAtual" maxlength="11" required>
+            </div>
+
+            <!-- Informações Pessoais -->
+            <h5>Informações Pessoais</h5>
+            <div class="form-group">
+                <label for="tipoPessoa">Tipo de Pessoa</label>
+                <select class="form-control shadowed" id="tipoPessoa" required>
+                   
+                    @if (tipoPessoaAtual == "F")
+                    {
+                        <option value="F">Física</option>
+                    }else{
+                        <option value="J">Jurídica</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="cpfCnpj">CPF/CNPJ</label>
+                <input type="text" class="form-control shadowed" id="cpfCnpj" value="@cpfCnpjAtual" maxlength="14" required disabled>
+            </div>
+            <p style="color: red;" id="cpfCnpjCadastrado">CPF/CNPJ já cadastrado.</p>
+            <div class="form-group">
+                <label for="inscricaoEstadual">Inscrição Estadual</label>
+                @if (@inscricaoEstAtual != null)
+                {
+                    <input type="text" class="form-control shadowed" value="@inscricaoEstAtual" id="inscricaoEstadual" maxlength="12" required>
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="isento">
+                        <label class="form-check-label" for="isento">Isento</label>
+                    </div>
+                }
+                else{
+                    <input type="text" class="form-control shadowed" id="inscricaoEstadual" maxlength="12" required disabled>
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="isento" checked>
+                        <label class="form-check-label" for="isento">Isento</label>
+                    </div>
+                }
+                <p style="color: red;" id="inscricaoCadastrada">Inscrição estadual já cadastrada.</p>
+            </div>
+            <!-- Campos adicionais para Pessoa Física -->
+            <div id="pessoaFisicaFields">
+                <div class="form-group">
+                    <label for="genero">Gênero</label>
+                    <select class="form-control shadowed" id="genero" name="genero" required>
+                        <option value="">Selecione</option>
+                        <option value="Feminino">Feminino</option>
+                        <option value="Masculino">Masculino</option>
+                        <option value="Outro">Outro</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="dataNascimento">Data de Nascimento</label>
+                    @if (dtNascimentoAtual != "01/01/2024")
+                    {
+                        <input type="text" class="form-control shadowed" value="@dtNascimentoAtual" id="dataNascimento" name="dataNascimento" required>
+                    }
+                    else
+                    {
+                        <input type="date" class="form-control shadowed" value="@dtNascimentoAtual" id="dataNascimento" name="dataNascimento" required>
+                    }
+                </div>
+            </div>
+
+            <!-- Situação do Cliente -->
+            <div class="container mt-4">
+                <div class="form-group">
+                    @if(bloqueadoAtual == "true"){
+                        <input type="checkbox" class="form-check-input" id="bloqueado" checked>
+                    }else{
+                        <input type="checkbox" class="form-check-input" id="bloqueado">
+                    }
+                    <label for="bloqueado" class="form-check-label">Bloqueado</label>
+                </div>
+            </div>
+
+            <!-- Senha de Acesso -->
+            <h5>Senha de Acesso</h5>
+            <div class="form-group">
+                <label for="senha">Senha</label>
+                <input type="password" class="form-control shadowed" id="senha" value="@senhaAtual" minlength="8" maxlength="15" required>
+            </div>
+            <div class="form-group">
+                <label for="confirmaSenha">Confirmação de Senha</label>
+                <input type="password" class="form-control shadowed" value="@senhaAtual" id="confirmaSenha" minlength="8" maxlength="15" required>
+                <div id="senhaError" class="text-danger hidden">As senhas não conferem</div>
+            </div>
+            <button class="btn btn-success" onclick="CadastroCliente()">Atualizar cadastro</button>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    let isento = false;
+    let bloqueado = false;
+    var emailCheck = false;
+    var cpfCnpjCheck = false;
+    var inscricaoEstadualCheck = false;
+    $(document).ready(function () {
+        $('#pessoaFisicaFields').hide();
+        $('#senhaError').hide();
+        $('#emailCadastrado').hide();
+        $('#cpfCnpjCadastrado').hide();
+        $('#inscricaoCadastrada').hide();
+        // Máscaras para telefone
+        $('#telefone').on('input', function () {
+            var value = $(this).val();
+            $(this).mask('(00)00000-0000');
+        });
+        // Máscaras para CPF/CNPJ e Inscrição Estadual
+        $('#cpfCnpj').on('input', function () {
+            var value = $(this).val();
+            if (value.length <= 12) {
+                $(this).mask('000.000.000-00');
+            } else {
+                $(this).mask('00.000.000/0000-00');
+            }
+        });
+        $('#inscricaoEstadual').mask('000.000.000-00');
+
+        // Mostrar/esconder campos adicionais para Pessoa Física
+        atualizarCamposTipoPessoa()
+        function atualizarCamposTipoPessoa() {
+            if ($('#tipoPessoa').val() === 'F') {
+                $('#pessoaFisicaFields').show();
+                $('#genero').prop('required', true);
+                $('#dataNascimento').prop('required', true);
+            } else {
+                $('#pessoaFisicaFields').hide();
+                $('#genero').prop('required', false);
+                $('#dataNascimento').prop('required', false);
+            }
+        }
+
+        // Habilitar/desabilitar Inscrição Estadual
+        $('#isento').change(function () {
+            if ($(this).is(':checked')) {
+                $('#inscricaoEstadual').prop('disabled', true).val('');
+                isento = true;
+            } else {
+                $('#inscricaoEstadual').prop('disabled', false);
+                isento = false;
+            }
+        });
+        $('#bloqueado').change(function () {
+            if ($(this).is(':checked')) {
+                bloqueado = true;
+            } else {
+                bloqueado = false;
+            }
+        });
+        // Validação de Senha
+        $('#cadastroForm').on('submit', function (event) {
+            // Verifica se as senhas são iguais
+            if ($('#senha').val() !== $('#confirmaSenha').val()) {
+                $('#senhaError').show();
+                event.preventDefault();
+                return false;
+            } else {
+                $('#senhaError').hide();
+                event.preventDefault();
+            }
+
+            // Adicione validação para campos obrigatórios e checagem de duplicidade
+            var email = $('#email').val();
+            var cpfCnpj = $('#cpfCnpj').val();
+            var inscricaoEstadual = $('#inscricaoEstadual').val();
+
+            // Simulação de validação de campos obrigatórios
+            var fields = ['#nomeCliente', '#email', '#telefone', '#cpfCnpj', '#senha', '#confirmaSenha'];
+            for (var i = 0; i < fields.length; i++) {
+                if ($(fields[i]).val() === '') {
+                    alert('Por favor, preencha todos os campos obrigatórios.');
+                    event.preventDefault();
+                    return false;
+                }
+            }
+        });
+
+    });
+    function CadastroCliente() {
+        let nomeCliente = $("#nomeCliente").val();
+        let email = $("#email").val();
+        let telefone = $("#telefone").val();
+        let tipoPessoa = $("#tipoPessoa").val();
+        let cpfCnpj = $("#cpfCnpj").val();
+        let inscricaoEstadual = $("#inscricaoEstadual").val();
+        let genero = $("#genero").val();
+        let dataNascimento = $("#dataNascimento").val();
+        let senha = $("#senha").val();
+        $.get(`@(Url.Action("CarregarClientes", "Home"))`, function (data) {
+
+            var dados = JSON.parse(data)
+            for (var i = 0; i < dados.length; i++) {
+                emailCheck = dados.filter(x => x.email === email);
+                cpfCnpjCheck = dados.filter(x => x.cpfCnpj === cpfCnpj);
+                inscricaoEstadualCheck = dados.filter(x => x.inscricaoEst === inscricaoEstadual);
+
+                if (emailCheck.length > 0 && emailCheck[0].id != @id) {
+                    emailCheck = true;
+                    $('#emailCadastrado').show();
+                } else {
+                    emailCheck = false;
+                    $('#emailCadastrado').hide();
+                }
+                if (cpfCnpjCheck.length > 0 && cpfCnpjCheck[0].id != @id) {
+                    cpfCnpjCheck = true;
+                    $('#cpfCnpjCadastrado').show();
+                } else {
+                    cpfCnpjCheck = false;
+                    $('#cpfCnpjCadastrado').hide();
+                }
+                if (inscricaoEstadualCheck.length > 0) {
+                    console.log(inscricaoEstadualCheck[0].isento)
+                    console.log(inscricaoEstadualCheck[0])
+                    if (inscricaoEstadualCheck[0].isento == false && inscricaoEstadualCheck[0].id != @id) {
+                        inscricaoEstadualCheck = true;
+                        $('#inscricaoCadastrada').show();
+                    } else {
+                        inscricaoEstadualCheck = false;
+                        $('#inscricaoCadastrada').hide();
+                    }
+                } else {
+                    inscricaoEstadualCheck = false;
+                    $('#inscricaoCadastrada').hide();
+                }
+            }
+            if (emailCheck == false && cpfCnpjCheck == false && inscricaoEstadualCheck == false) {
+                $.ajax({
+                    method: "POST",
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    url: "@(Url.Action("AtualizarCadastro", "Home"))",
+                    data: JSON.stringify({
+                        nomeCliente: nomeCliente,
+                        email: email,
+                        telefone: telefone,
+                        tipoPessoa: tipoPessoa,
+                        cpfCnpj: cpfCnpj,
+                        inscricaoEstadual: inscricaoEstadual,
+                        genero: genero,
+                        dataNascimento: dataNascimento,
+                        senha: senha,
+                        isento: isento,
+                        bloqueado: bloqueado
+                    }),
+                    success: function (data) {
+                        window.location.href = "/Home/Index"
+                    }, error: function (params) {
+                        console.log("error")
+                        console.log(params)
+                        alert("Erro ao criar o cadastro.")
+                        window.location.href = "/Home/Index"
+                    }
+
+                });
+            }
+        });
+
+
+    }
+</script>
+
